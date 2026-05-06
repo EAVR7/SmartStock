@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const productRoutes = require("./presentation/routes/product.routes");
 const stockRoutes = require("./presentation/routes/stock.routes");
+const authRoutes = require("./presentation/routes/auth.routes");
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
+app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/stock", stockRoutes);
 
