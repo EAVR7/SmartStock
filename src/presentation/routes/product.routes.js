@@ -1,12 +1,13 @@
 const express = require("express");
 const productController = require("../controllers/product.controller");
+const { authenticateToken, requireRole } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-router.get("/", productController.listProducts);
-router.get("/:id", productController.getProduct);
-router.post("/", productController.createProduct);
-router.put("/:id", productController.updateProduct);
-router.delete("/:id", productController.deleteProduct);
+router.get("/", authenticateToken, productController.listProducts);
+router.get("/:id", authenticateToken, productController.getProduct);
+router.post("/", authenticateToken, requireRole("admin"), productController.createProduct);
+router.put("/:id", authenticateToken, requireRole("admin"), productController.updateProduct);
+router.delete("/:id", authenticateToken, requireRole("admin"), productController.deleteProduct);
 
 module.exports = router;
