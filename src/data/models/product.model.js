@@ -33,11 +33,18 @@ module.exports = (sequelize, DataTypes) => {
       price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true,
+        validate: {
+          min: 0,
+        },
       },
       stockMinimo: {
         type: DataTypes.INTEGER,
         allowNull: true,
         field: "stock_minimo",
+        validate: {
+          min: 0,
+          isInt: true,
+        },
       },
     },
     {

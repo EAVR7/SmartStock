@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { authAPI } from '../services/apiService';
 
-export function useAuth() {
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,7 +14,7 @@ export function useAuth() {
       if (token) {
         try {
           const response = await authAPI.getMe();
-          setUser(response.data);
+          setUser(response.data.user);
           setIsAuthenticated(true);
         } catch (error) {
           localStorage.removeItem('token');
@@ -25,15 +27,11 @@ export function useAuth() {
   }, []);
 
   const login = async (email, password) => {
-    try {
-      const response = await authAPI.login(email, password);
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
+    const response = await authAPI.login(email, password);
+    localStorage.setItem('token', response.data.token);
+    setUser(response.data.user);
+    setIsAuthenticated(true);
+    return response.data;
   };
 
   const logout = () => {
@@ -42,11 +40,13 @@ export function useAuth() {
     setIsAuthenticated(false);
   };
 
-  return {
-    user,
-    loading,
-    isAuthenticated,
-    login,
-    logout,
-  };
+  return (
+    <AuthContext.Provider value={{ user, loading, isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
 }

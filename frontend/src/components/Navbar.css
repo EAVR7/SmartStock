@@ -2,50 +2,71 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   padding: 1rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
 
-.navbar-brand h1 {
-  margin: 0;
-  font-size: 1.5rem;
+.navbar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
 }
 
 .navbar-menu {
   display: flex;
-  gap: 1.5rem;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .navbar-menu a {
-  color: white;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
-  transition: opacity 0.3s;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+  padding: 0.5rem;
 }
 
 .navbar-menu a:hover {
-  opacity: 0.8;
+  color: var(--primary-color);
 }
 
 .user-info {
-  font-size: 0.9rem;
-  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--bg-color);
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid white;
-  color: white;
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 6px;
   font-weight: 500;
-  transition: background 0.3s;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background-color: var(--danger-color);
+  color: #fff;
 }

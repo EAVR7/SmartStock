@@ -7,6 +7,11 @@ const authRoutes = require("./presentation/routes/auth.routes");
 const adminRoutes = require("./presentation/routes/admin.routes");
 const settingsRoutes = require("./presentation/routes/settings.routes");
 const reportRoutes = require("./presentation/routes/report.routes");
+const categoryRoutes = require("./presentation/routes/category.routes");
+const {
+  notFound,
+  errorHandler,
+} = require("./presentation/middlewares/error.middleware");
 
 dotenv.config();
 
@@ -18,6 +23,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/stock", stockRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/settings", settingsRoutes);
@@ -26,6 +32,9 @@ app.use("/api/reports", reportRoutes);
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Smart Stock listening on port ${port}`);

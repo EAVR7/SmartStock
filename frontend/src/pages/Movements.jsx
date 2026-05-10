@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ArrowRightLeft, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { stockAPI, productsAPI } from '../services/apiService';
 import './Movements.css';
 
@@ -51,7 +52,7 @@ export function Movements({ user }) {
 
   return (
     <div className="movements-page">
-      <h1>➡️ Movimientos de Stock</h1>
+      <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ArrowRightLeft size={32} /> Movimientos de Stock</h1>
 
       <div className="movements-container">
         <div className="form-section">
@@ -92,6 +93,7 @@ export function Movements({ user }) {
               <label>Cantidad</label>
               <input
                 type="number"
+                min="1"
                 value={formData.quantity}
                 onChange={(e) =>
                   setFormData({ ...formData, quantity: e.target.value })
@@ -137,7 +139,7 @@ export function Movements({ user }) {
                 {movements.map((mov) => (
                   <tr key={mov.id}>
                     <td>{mov.product?.name}</td>
-                    <td>{mov.type === 'entrada' ? '📥' : '📤'}</td>
+                    <td>{mov.type === 'entrada' ? <ArrowDownCircle size={18} color="green" /> : <ArrowUpCircle size={18} color="red" />}</td>
                     <td>{mov.quantity}</td>
                     <td>{mov.reason}</td>
                     <td>{new Date(mov.createdAt).toLocaleDateString()}</td>

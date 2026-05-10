@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Settings as SettingsIcon, Save } from 'lucide-react';
 import { settingsAPI } from '../services/apiService';
 import './Settings.css';
 
@@ -18,11 +19,13 @@ export function Settings({ user }) {
   const fetchSettings = async () => {
     try {
       const response = await settingsAPI.getSettings();
-      setSettings(response.data || {
-        theme: 'light',
-        density: 'normal',
-        language: 'es',
-      });
+      setSettings(
+        response.data?.settings || {
+          theme: 'light',
+          density: 'normal',
+          language: 'es',
+        }
+      );
     } catch (error) {
       console.error('Error fetching settings:', error);
     } finally {
@@ -33,6 +36,7 @@ export function Settings({ user }) {
   const handleSave = async () => {
     try {
       await settingsAPI.updateSettings(settings);
+      document.body.setAttribute('data-theme', settings.theme);
       setMessage('Configuración guardada ✓');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
@@ -44,7 +48,7 @@ export function Settings({ user }) {
 
   return (
     <div className="settings-page">
-      <h1>⚙️ Configuración</h1>
+      <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><SettingsIcon size={32} /> Configuración</h1>
 
       <div className="settings-container">
         <div className="settings-card">
@@ -105,8 +109,8 @@ export function Settings({ user }) {
 
           {message && <p className="message">{message}</p>}
 
-          <button onClick={handleSave} className="save-btn">
-            💾 Guardar Cambios
+          <button onClick={handleSave} className="save-btn" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+            <Save size={18} /> Guardar Cambios
           </button>
         </div>
       </div>

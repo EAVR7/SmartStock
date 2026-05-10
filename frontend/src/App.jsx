@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { Navbar } from './components/Navbar';
@@ -5,15 +6,34 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Products } from './pages/Products';
+import { Categories } from './pages/Categories';
 import { Movements } from './pages/Movements';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
+import { settingsAPI } from './services/apiService';
 import './App.css';
 
 function App() {
-  const { user, loading, isAuthenticated, login, logout } = useAuth();
+  const { user, loading: authLoading, isAuthenticated, login, logout } = useAuth();
+  const [themeLoading, setThemeLoading] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      settingsAPI.getSettings().then((response) => {
+        const theme = response.data?.settings?.theme || 'light';
+        document.body.setAttribute('data-theme', theme);
+        setThemeLoading(false);
+      }).catch(() => {
+        document.body.setAttribute('data-theme', 'light');
+        setThemeLoading(false);
+      });
+    } else {
+      document.body.setAttribute('data-theme', 'light');
+      setThemeLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  if (authLoading || themeLoading) {
     return (
       <div className="loading-screen">
         <div className="spinner"></div>
@@ -47,6 +67,19 @@ function App() {
                 requiredRole="admin"
               >
                 <Products user={user} />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                user={user}
+                requiredRole="admin"
+              >
+                <Categories />
               </ProtectedRoute>
             }
           />

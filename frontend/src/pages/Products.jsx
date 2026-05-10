@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { productsAPI } from '../services/apiService';
+import { ClipboardList, Plus, X, Trash2 } from 'lucide-react';
+import { productsAPI, categoriesAPI } from '../services/apiService';
 import './Products.css';
 
 export function Products({ user }) {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,15 +17,19 @@ export function Products({ user }) {
   });
 
   useEffect(() => {
-    fetchProducts();
+    fetchData();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchData = async () => {
     try {
-      const response = await productsAPI.getAll();
-      setProducts(response.data);
+      const [productsRes, categoriesRes] = await Promise.all([
+        productsAPI.getAll(),
+        categoriesAPI.getAll()
+      ]);
+      setProducts(productsRes.data);
+      setCategories(categoriesRes.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -46,7 +52,7 @@ export function Products({ user }) {
         minimumStock: '',
       });
       setShowForm(false);
-      fetchProducts();
+      fetchData();
       alert('Producto creado');
     } catch (error) {
       alert('Error al crear producto: ' + error.message);
@@ -59,23 +65,29 @@ export function Products({ user }) {
 
     try {
       await productsAPI.delete(id);
-      fetchProducts();
+      fetchData();
       alert('Producto eliminado');
     } catch (error) {
       alert('Error al eliminar: ' + error.message);
     }
   };
 
+  const getCategoryName = (id) => {
+    const category = categories.find(c => c.id === id);
+    return category ? category.name : 'N/A';
+  };
+
   return (
     <div className="products-page">
       <div className="page-header">
-        <h1>📋 Gestión de Productos</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={32} /> Gestión de Productos</h1>
         {user?.role === 'admin' && (
           <button
             className="primary-btn"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={() => setShowForm(!showForm)}
           >
-            {showForm ? 'Cancelar' : '➕ Nuevo Producto'}
+            {showForm ? <><X size={18} /> Cancelar</> : <><Plus size={18} /> Nuevo Producto</>}
           </button>
         )}
       </div>
@@ -100,9 +112,23 @@ export function Products({ user }) {
             }
             required
           />
+          <select
+            value={formData.categoryId}
+            onChange={(e) =>
+              setFormData({ ...formData, categoryId: e.target.value })
+            }
+            required
+          >
+            <option value="" disabled>Seleccione una categoría</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
           <input
             type="number"
             placeholder="Precio"
+            min="0"
+            step="0.01"
             value={formData.price}
             onChange={(e) =>
               setFormData({ ...formData, price: e.target.value })
@@ -112,6 +138,7 @@ export function Products({ user }) {
           <input
             type="number"
             placeholder="Stock Mínimo"
+            min="0"
             value={formData.minimumStock}
             onChange={(e) =>
               setFormData({ ...formData, minimumStock: e.target.value })
@@ -132,6 +159,7 @@ export function Products({ user }) {
             <tr>
               <th>Nombre</th>
               <th>SKU</th>
+              <th>Categoría</th>
               <th>Precio</th>
               <th>Stock</th>
               <th>Mínimo</th>
@@ -139,25 +167,42 @@ export function Products({ user }) {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>{product.sku}</td>
-                <td>${product.price.toFixed(2)}</td>
-                <td>{product.currentStock || 0}</td>
-                <td>{product.minimumStock}</td>
-                {user?.role === 'admin' && (
+            {products.map((product) => {
+              const isLowStock =
+                product.currentStock <= product.minimumStock;
+              return (
+                <tr
+                  key={product.id}
+                  className={isLowStock ? 'low-stock-row' : ''}
+                >
+                  <td>{product.name}</td>
+                  <td>{product.sku}</td>
+                  <td>{getCategoryName(product.categoryId)}</td>
+                  <td>${Number(product.price).toFixed(2)}</td>
                   <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDelete(product.id)}
+                    <span
+                      className={`stock-badge ${
+                        isLowStock ? 'warning' : ''
+                      }`}
                     >
-                      🗑️
-                    </button>
+                      {product.currentStock || 0}
+                    </span>
                   </td>
-                )}
-              </tr>
-            ))}
+                  <td>{product.minimumStock}</td>
+                  {user?.role === 'admin' && (
+                    <td>
+                      <button
+                        className="delete-btn"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => handleDelete(product.id)}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

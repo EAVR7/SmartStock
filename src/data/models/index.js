@@ -6,11 +6,11 @@ const Category = require("./category.model")(sequelize, DataTypes);
 const Product = require("./product.model")(sequelize, DataTypes);
 const InventoryMovement = require("./movement.model")(sequelize, DataTypes);
 
-Category.hasMany(Product, { foreignKey: "category_id" });
-Product.belongsTo(Category, { foreignKey: "category_id" });
+Category.hasMany(Product, { foreignKey: "categoryId" });
+Product.belongsTo(Category, { foreignKey: "categoryId" });
 
-Product.hasMany(InventoryMovement, { foreignKey: "product_id" });
-InventoryMovement.belongsTo(Product, { foreignKey: "product_id" });
+Product.hasMany(InventoryMovement, { foreignKey: "productId" });
+InventoryMovement.belongsTo(Product, { foreignKey: "productId" });
 
 module.exports = {
   sequelize,
